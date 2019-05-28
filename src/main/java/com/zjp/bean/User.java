@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,6 +43,9 @@ public class User implements Serializable {
 
 	@NotBlank
 	private String name;
+
+	private Date createTime;
+
 	@NotNull
 	private Integer age;
 	private BigDecimal balance;

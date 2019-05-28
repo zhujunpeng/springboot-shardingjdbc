@@ -39,28 +39,28 @@ sharding:
         url: jdbc:mysql://localhost:3306/test2?useUnicode=true&characterEncoding=utf8&useSSL=true&useSSL=true&?useAffectedRows=true&allowMultiQueries=true
         username: root
       names: ds0,ds1
-    config:
-      sharding:
-        # 定义哪些表需要分库分表  有多个的话用，分割
-        binding-tables: t_user
-        tables:
-          t_user:
-            # 分表策略
-            table-strategy:
-              # 行表达式策略
-              inline:
-                # 使用哪个字段进行分表
-                sharding-column: age
-                # 分表规则
-                algorithm-expression: t_user$->{age % 2}
-            # 自增列名称，缺省表示不使用自增主键生成器
-            key-generator-column-name: user_id
-            # 实际选择的数据库以及对应的表
-            actual-data-nodes: ds$->{0..1}.t_user$->{0..1}
-        # 数据库分库策略
-        default-database-strategy:
-          inline:
-            # 以userId进行分表
-            sharding-column: user_id
-            algorithm-expression: ds$->{user_id % 2}
-        broadcast-tables: t_config
+    sharding:
+      # 需要分表逗号（，）分割
+      #      binding-tables: t_order,t_order_item
+      binding-tables: t_user
+      tables:
+        #        t_order_item:
+        #          key-generator:
+        #            column: order_item_id
+        #          table-strategy:
+        #            inline:
+        #              sharding-column: order_id
+        #              algorithm-expression: t_order_item$->{order_id % 2}
+        #          actual-data-nodes: ds$->{0..1}.t_order_item$->{0..1}
+        t_user:
+          actualDataNodes: ds$->{0..1}.t_user$->{0..1}
+          # 分表规则
+          table-strategy:
+            standard:
+              sharding-column: create_time
+              preciseAlgorithmClassName: com.zjp.strategy.PreciseModuloShardingTableAlgorithm
+      default-database-strategy:
+        inline:
+          sharding-column: user_id
+          algorithm-expression: ds$->{user_id % 2}
+      broadcast-tables: t_config

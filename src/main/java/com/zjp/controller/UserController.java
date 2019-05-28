@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,7 @@ public class UserController {
      */
     @PostMapping("/add")
     public Result addUser(@Validated @RequestBody User user){
+        user.setCreateTime(new Date());
         userService.addUser(user);
         return Result.success();
     }
