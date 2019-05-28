@@ -8,8 +8,11 @@ import org.apache.shardingsphere.api.config.sharding.TableRuleConfiguration;
 import org.apache.shardingsphere.api.config.sharding.strategy.InlineShardingStrategyConfiguration;
 import org.apache.shardingsphere.api.config.sharding.strategy.StandardShardingStrategyConfiguration;
 import org.apache.shardingsphere.shardingjdbc.api.ShardingDataSourceFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -26,13 +29,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 public class ShardingConfiguration {
 
-    @Bean
+    @Bean("shardingDataSource")
     public DataSource getDataSource() throws SQLException {
         ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
         shardingRuleConfig.getTableRuleConfigs().add(getOrderTableRuleConfiguration());
         shardingRuleConfig.getTableRuleConfigs().add(getOrderItemTableRuleConfiguration());
 //        shardingRuleConfig.getBindingTableGroups().add("t_order, t_order_item");
         shardingRuleConfig.getBindingTableGroups().add("t_user");
+        // 设置默认数据源，如果没有设置默认数据源不需要分库分表的就会出现找不到数据库的问题
+        shardingRuleConfig.setDefaultDataSourceName("ds0");
         shardingRuleConfig.setDefaultDatabaseShardingStrategyConfig(new InlineShardingStrategyConfiguration("user_id", "ds${user_id % 2}"));
         // 分表规则
         shardingRuleConfig.setDefaultTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("name", new PreciseModuloShardingTableAlgorithm()));
@@ -82,4 +87,11 @@ public class ShardingConfiguration {
         return result;
     }
 
+    /**
+     * 手动声明配置事务
+     */
+    @Bean
+    public DataSourceTransactionManager transactitonManager(@Qualifier("shardingDataSource") DataSource dataSource){
+        return new DataSourceTransactionManager(dataSource);
+    }
 }

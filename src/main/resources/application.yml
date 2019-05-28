@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: test-server
+  datasource:
+    password: root
+    username: root
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=true&useSSL=true&?useAffectedRows=true&allowMultiQueries=true
+    type: com.alibaba.druid.pool.DruidDataSource
 mybatis:
   type-aliases-package: com.zjp.bean
   mapper-locations: classpath:mybatis/*.xml
@@ -21,46 +27,3 @@ mapper:
   mappers: com.zjp.utils.MyMapper
   identity: MYSQL
   not-empty: false
-
-# 分库分表配置
-sharding:
-  jdbc:
-    datasource:
-      ds0:
-        password: root
-        type: com.alibaba.druid.pool.DruidDataSource
-        driver-class-name: com.mysql.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=true&useSSL=true&?useAffectedRows=true&allowMultiQueries=true
-        username: root
-      ds1:
-        password: root
-        type: com.alibaba.druid.pool.DruidDataSource
-        driver-class-name: com.mysql.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/test2?useUnicode=true&characterEncoding=utf8&useSSL=true&useSSL=true&?useAffectedRows=true&allowMultiQueries=true
-        username: root
-      names: ds0,ds1
-    sharding:
-      # 需要分表逗号（，）分割
-      #      binding-tables: t_order,t_order_item
-      binding-tables: t_user
-      tables:
-        #        t_order_item:
-        #          key-generator:
-        #            column: order_item_id
-        #          table-strategy:
-        #            inline:
-        #              sharding-column: order_id
-        #              algorithm-expression: t_order_item$->{order_id % 2}
-        #          actual-data-nodes: ds$->{0..1}.t_order_item$->{0..1}
-        t_user:
-          actualDataNodes: ds$->{0..1}.t_user$->{0..1}
-          # 分表规则
-          table-strategy:
-            standard:
-              sharding-column: create_time
-              preciseAlgorithmClassName: com.zjp.strategy.PreciseModuloShardingTableAlgorithm
-      default-database-strategy:
-        inline:
-          sharding-column: user_id
-          algorithm-expression: ds$->{user_id % 2}
-      broadcast-tables: t_config
