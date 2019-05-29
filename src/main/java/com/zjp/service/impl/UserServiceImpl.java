@@ -65,7 +65,9 @@ public class UserServiceImpl implements UserService {
     public PageResultSet<User> getAllUser(int pageNo) {
         // 分页
         PageHelper.startPage(pageNo,2);
-        List<User> users = userMapper.getAllUser();
+        Example example = new Example(User.class);
+        example.orderBy("id").desc();
+        List<User> users = userMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo(users);
         // 返回所有数量
         long total = pageInfo.getTotal();

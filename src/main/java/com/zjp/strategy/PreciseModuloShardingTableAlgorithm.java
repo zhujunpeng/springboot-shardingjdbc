@@ -15,7 +15,7 @@ public class PreciseModuloShardingTableAlgorithm implements PreciseShardingAlgor
 
     @Override
     public String doSharding(Collection<String> collection, PreciseShardingValue<String> preciseShardingValue) {
-        String tb_name=preciseShardingValue.getLogicTableName();
+        String tb_name = preciseShardingValue.getLogicTableName();
         try {
             String value = preciseShardingValue.getValue();
             tb_name = tb_name + (value.hashCode() % 2);

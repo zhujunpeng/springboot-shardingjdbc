@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 分库库分表配置
  * @Author: zhujunpeng
  * @Date: 2019/5/28 14:49
  * @Version 1.0
@@ -39,8 +40,8 @@ public class ShardingConfiguration {
         // 设置默认数据源，如果没有设置默认数据源不需要分库分表的就会出现找不到数据库的问题
         shardingRuleConfig.setDefaultDataSourceName("ds0");
         shardingRuleConfig.setDefaultDatabaseShardingStrategyConfig(new InlineShardingStrategyConfiguration("user_id", "ds${user_id % 2}"));
-        // 分表规则
-        shardingRuleConfig.setDefaultTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("name", new PreciseModuloShardingTableAlgorithm()));
+        // 分表规则，如果有多个，那么使用多个分表规则
+        //shardingRuleConfig.setDefaultTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("create_time", new PreciseModuloShardingTableAlgorithm()));
         return ShardingDataSourceFactory.createDataSource(createDataSourceMap(), shardingRuleConfig, new Properties());
     }
 
@@ -52,6 +53,7 @@ public class ShardingConfiguration {
         TableRuleConfiguration result = new TableRuleConfiguration("t_user", "ds${0..1}.t_user${0..1}");
         // 生成id规则
 //        result.setKeyGeneratorConfig(new KeyGeneratorConfiguration("SNOWFLAKE", "order_id", new Properties()));
+        result.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("name", new PreciseModuloShardingTableAlgorithm()));
         return result;
     }
 
